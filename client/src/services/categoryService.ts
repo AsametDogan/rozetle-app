@@ -10,7 +10,6 @@ export const getAllCategory = async () => {
                 'auth-token': token
             },
         });
-        console.log("!!!!!getAllCategory!!!!!!" + response)
         return response.data
     } catch (error) {
         console.error('Category failed', error);
@@ -29,7 +28,6 @@ export const updateCategory = async ({ title, categoryId }) => {
                 'auth-token': token
             },
         });
-        console.log("!!!!!updateCategory!!!!!!" + response)
         return true
     } catch (error) {
         console.error('Badge failed', error);
@@ -48,7 +46,6 @@ export const createCategory = async (title) => {
             },
         });
 
-        console.log("!!!!!createCategory!!!!!!" + response)
         return true
     } catch (error) {
         console.error('Badge failed', error);

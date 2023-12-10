@@ -85,7 +85,6 @@ const UpdateBadge = ({ open, badge, setOpen }) => {
       });
     }
   };
-  console.log(badgeData);
   return (
     <Dialog open={open} handler={setOpen}>
       <DialogHeader>Its a simple dialog.</DialogHeader>

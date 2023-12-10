@@ -7,20 +7,18 @@ import { Input } from "@material-tailwind/react";
 const Badges = () => {
   const [allBadges, setAllBadges] = useState();
   const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    async function fetchBadges() {
-      const response = await getAllBadges();
-      if (response) {
-        setAllBadges(response.data);
-      } else {
-        toast.error("Rozetle Getirilemedi");
-      }
+  async function fetchBadges() {
+    const response = await getAllBadges();
+    if (response) {
+      setAllBadges(response.data);
+    } else {
+      toast.error("Rozetle Getirilemedi");
     }
+  }
+  useEffect(() => {
     fetchBadges();
   }, []);
   const filteredData = allBadges?.filter((item) => {
-    console.log(item);
     if (!allBadges) {
       return [];
     }
@@ -43,7 +41,7 @@ const Badges = () => {
 
       {filteredData ? (
         filteredData.map((badge, index) => (
-          <BadgeCard badge={badge} key={index} />
+          <BadgeCard fetchBadges={fetchBadges} badge={badge} key={index} />
         ))
       ) : (
         <></>

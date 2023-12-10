@@ -1,3 +1,4 @@
+import excel from 'exceljs';
 import { Request, Response, response } from "express";
 import { AssignmentModel, BadgeModel, NotifyModel, NotifyTokenModel, UserModel, VerificationModel } from "../models";
 import { IAssignment, IBadge, IRequestWithUser } from "../interfaces";
@@ -244,18 +245,25 @@ const getAllUsers = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Hata oluştu", success: false });
     }
 }
-const levelUp = async (req: Request, res: Response) => {
+const changeRole = async (req: Request, res: Response) => {
     try {
         const { userId } = req.body
         if (!userId) {
             return res.status(404).json({ message: 'Geçersiz uid', success: false });
         }
-        const user = await UserModel.findByIdAndUpdate(userId, {
-            role: 1
-        }, { new: true })
-        return res.status(200).json({ message: "Kullanıcı rolü 1", success: true })
+
+        const user = await UserModel.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: 'bir hata oluştu bulunamadı', success: false });
+        } else if (user.role === 1) {
+            user.role = 0
+        } else {
+            user.role = 1
+        }
+        await user.save()
+        return res.status(200).json({ message: "Kullanıcı rolü: " + user.role, success: true })
     } catch (error) {
-        console.log({ location: "levelup: ", error })
+        console.log({ function: "changeRole: ", error })
         return res.status(404).json({ message: 'bir hata oluştu', success: false });
     }
 }
@@ -291,7 +299,7 @@ const getAllBadgesAdmin = async (req: Request, res: Response) => {
             data.push({ ...badge, count: datas.length })
         }
 
-        res.status(200).json({ data: shuffleArray(data), success: true, message: "Rozetler getirildi" });
+        res.status(200).json({ data: data, success: true, message: "Rozetler getirildi" });
     } catch (error) {
         res.status(500).json({ message: 'Rozetler getirilirken bir hata oluştu', success: false });
     }
@@ -307,6 +315,22 @@ const setBadgeAttainer = async (req: Request, res: Response) => {
 
 
     } catch (error) {
+        res.status(500).json({ message: 'Rozet güncellenirken bir hata oluştu', success: false });
+
+    }
+}
+const changeIsActive = async (req: Request, res: Response) => {
+    const { badgeId } = req.body
+    try {
+        console.log(badgeId)
+        const badge = await BadgeModel.findById(badgeId)
+        badge.isActive = !badge.isActive
+        await badge.save()
+        res.status(200).json({ data: "", success: true, message: "Rozet güncellendi " });
+
+
+    } catch (error) {
+        console.log({ method: "changeIsActive", error })
         res.status(500).json({ message: 'Rozet güncellenirken bir hata oluştu', success: false });
 
     }
@@ -334,20 +358,22 @@ const getAllToken = async (req: Request, res: Response) => {
     }
 }
 
+
 export {
     sendBadges,
+
     createBadge,
     setBadgeAttainer,
     getAllNotify,
     getAllToken,
     deleteAssign,
-    deleteBadge,
+    deleteBadge, changeIsActive,
     getAllBadgesAdmin,
     getAllVerification, uploadImgLink,
     deleteUser,
     getAllAssign,
     getAllUsers,
     getInfo,
-    levelUp,
+    changeRole,
     updateBadge
 }

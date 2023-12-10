@@ -18,11 +18,11 @@ const NewBadge = () => {
     categoryId: "",
     totalCount: 0,
     price: 0,
-    attainerRoles: "",
+    attainerRoles: [],
     badgeImg: null,
   });
   const [imgPreview, setImgPreview] = useState();
-  const [searchUser, setSearchUser] = useState();
+  const [searchUser, setSearchUser] = useState("");
   const [isUnique, setIsUnique] = useState();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,9 +53,9 @@ const NewBadge = () => {
   const [users, setUsers] = useState();
 
   async function fetchUsers() {
-    const response = await fetchUsers();
+    const response = await getAllUsers();
     if (response) {
-      setUsers(response.data);
+      setUsers(response);
     }
   }
   useEffect(() => {
@@ -99,7 +99,6 @@ const NewBadge = () => {
       toast.error("Tüm Alanları Doldurunuz");
     }
   };
-  console.log(badgeData);
   const handleCheckBox = (e) => {
     if (badgeData?.attainerRoles?.includes(e.target.value)) {
       setBadgeData({
@@ -115,25 +114,58 @@ const NewBadge = () => {
       });
     }
   };
+  // console.log(users);
   const filteredData = users?.filter((item) => {
     if (!users) {
       return [];
     }
     return (
-      item?.name.toLowerCase().includes(searchUser.toLowerCase()) ||
-      item?.surname.toLowerCase().includes(searchUser.toLowerCase()) ||
-      item?.nickName.toLowerCase().includes(searchUser.toLowerCase()) ||
-      item?.email[0].toLowerCase().includes(searchUser.toLowerCase())
+      item?.name.toLowerCase().includes(searchUser?.toLowerCase()) ||
+      item?.surname.toLowerCase().includes(searchUser?.toLowerCase()) ||
+      item?.nickName.toLowerCase().includes(searchUser?.toLowerCase()) ||
+      item?.phone.replace(/\s/g, "").includes(searchUser?.replace(/\s/g, ""))
     );
   });
-
+  console.log(badgeData);
   return (
     <div className="flex flex-col h-full w-full gap-5 justify-center  items-center overflow-y-scroll scrollbar-hide">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg flex flex-row justify-center gap-5"
+        className="bg-white p-6 rounded-lg flex flex-row justify-center gap-5"
       >
-        <div className="flex flex-col  gap-5">
+        {isUnique ? (
+          <div className="border-r-2 bg-gray-200 p-4 rounded-l-lg border-gray-500 px-5 flex flex-col gap-5 ">
+            <Typography
+              color="blue-gray"
+              className="font-semibold border-b border-gray-600"
+            >
+              Yetkili Kullanıcılar
+            </Typography>
+            <div className="flex flex-col items-center  gap-3 overflow-y-scroll scrollbar-hide h-[500px] bg-white p-3 rounded-lg">
+              {badgeData.attainerRoles.length > 0 ? (
+                users.map((user, index) => {
+                  if (badgeData.attainerRoles.includes(user._id)) {
+                    return (
+                      <div
+                        key={index}
+                        className="px-2.5 py-1 bg-green-200 rounded-lg	 "
+                      >
+                        <Typography color="blue-gray" className="font-medium">
+                          {user.name + " " + user.surname}
+                        </Typography>
+                      </div>
+                    );
+                  }
+                })
+              ) : (
+                <></>
+              )}
+            </div>
+          </div>
+        ) : (
+          <></>
+        )}
+        <div className="flex flex-col  gap-5 p-2 ">
           <div className="mb-4 flex flex-col gap-2 items-center">
             {imgPreview && (
               <div className="mt-2">
@@ -288,7 +320,13 @@ const NewBadge = () => {
             checked={isUnique}
             onChange={async () => {
               setIsUnique(!isUnique);
-              await getAllUsers();
+              if (isUnique) {
+                setBadgeData({
+                  ...badgeData,
+                  attainerRoles: [],
+                });
+              }
+              await fetchUsers();
             }}
             className="text-sm h-4  w-4"
             label="Yetkili Seç"
@@ -304,31 +342,59 @@ const NewBadge = () => {
           </button>
         </div>
         {isUnique ? (
-          <div className="border-l-2 border-gray-500 px-5 flex flex-col gap-5">
+          <div className="border-l-2 bg-gray-200 p-4 rounded-r-lg border-gray-500 px-5 flex flex-col gap-5 ">
             <Input
               value={searchUser}
-              label="Kişi"
+              label="Kişi ekle"
               onChange={(e) => {
                 setSearchUser(e.target.value);
               }}
               type="search"
+              className="bg-white"
             />
-            <div className="flex flex-col gap-3 ">
+            <div className="flex flex-col gap-3 overflow-y-scroll h-[500px] bg-white p-2 rounded-lg ">
               {filteredData && filteredData?.length !== 0 ? (
                 filteredData?.map((user, index) => (
                   <Checkbox
+                    key={index}
+                    checked={badgeData?.attainerRoles?.includes(user._id)}
+                    onChange={() => {
+                      if (badgeData?.attainerRoles?.includes(user._id)) {
+                        setBadgeData({
+                          ...badgeData,
+                          attainerRoles: badgeData?.attainerRoles?.filter(
+                            (data) => data !== user._id
+                          ),
+                        });
+                      } else {
+                        setBadgeData({
+                          ...badgeData,
+                          attainerRoles: [...badgeData.attainerRoles, user._id],
+                        });
+                      }
+                    }}
                     label={
                       <div>
                         <Typography color="blue-gray" className="font-medium">
-                          Remember Me
+                          {user.name + " " + user.surname}
                         </Typography>
                         <Typography
                           variant="small"
                           color="gray"
                           className="font-normal"
                         >
-                          You&apos;ll be able to login without password for 24
-                          hours.
+                          <span>{user.email[0] || ""}</span>
+                          <br />
+                          <span>{user.phone || ""}</span>
+                          <br />
+                          <span>
+                            <b>Tip:</b>
+                            {user.role === 0
+                              ? "Kullanıcı"
+                              : user.role === 1
+                              ? "Kurum"
+                              : "Admin"}
+                          </span>
                         </Typography>
                       </div>
                     }

@@ -13,14 +13,17 @@ import {
     getAllToken,
     getAllUsers,
     getAllVerification,
-    levelUp,
+    changeRole,
     sendBadges,
     setBadgeAttainer,
     updateBadge,
-    uploadImgLink
+    uploadImgLink,
+    changeIsActive,
+
 } from "../controllers/admin.controller";
 import categoryRouter from "./categoryRoutes"
 import { adminMiddleware } from "../middleware/adminMiddleware";
+import { exportAssignments, exportBadges, exportCategories, exportUsers } from "../controllers/file.controller";
 const router = express.Router();
 
 const uploadBadge = multer({ storage: badgeImgStorage })
@@ -53,6 +56,8 @@ router.post("/setBadgeAttainer", adminMiddleware, setBadgeAttainer) // rozetin a
 //userId badgeId
 
 
+router.put("/badge/changeIsActive", adminMiddleware, changeIsActive)
+
 //rozet silme methodu kaldırılmıştır
 router.delete('/badge/delete', deleteBadge) //bodydeki badgeId datasını sil
 // { badgeId } body 
@@ -63,8 +68,14 @@ router.put('/badge/update', adminMiddleware, updateBadge) //bodydeki badgeId dat
 router.get("/getAllVerification", getAllVerification)
 
 router.get("user/getAll", getAllUsers) // tüm kullanıcılar
-router.post("user/levelUp", adminMiddleware, levelUp) // kullanıcıyı rolü 1 yap
+router.put("/user/changeRole", adminMiddleware, changeRole) // kullanıcıyı rolü 1 yap
 // { userId } body
+
+router.get("/users/export", adminMiddleware, exportUsers)
+router.get("/badges/export", adminMiddleware, exportBadges)
+router.get("/assignments/export", adminMiddleware, exportAssignments)
+router.get("/categories/export", adminMiddleware, exportCategories)
+
 
 router.delete("user/delete", adminMiddleware, deleteUser) // kullanıcıyı sil
 // { userId } body
