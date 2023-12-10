@@ -15,6 +15,8 @@ import IconAddlist from "./icons/addlist.png";
 import IconAdd from "./icons/add.png";
 import IconAccept from "./icons/accept.png";
 import IconSearch from "./icons/search.png";
+import IconExport from "./icons/export.png";
+import IconDownloadXls from "./icons/xlsx-download.png";
 
 export {
   IconHidePass,
@@ -22,9 +24,11 @@ export {
   IconAddBadge,
   ImgMockup,
   IconAccept,
+  IconDownloadXls,
   IconAddlist,
   IconAdd,
   IconViewPass,
+  IconExport,
   ImgAppstore,
   ImgPlaystore,
   IconList,

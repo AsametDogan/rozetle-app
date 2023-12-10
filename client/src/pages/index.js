@@ -9,7 +9,9 @@ import RepairPage from "./RepairPage";
 import NotFound from "./NotFound";
 import AllAssignment from "./admin/AllAssignment";
 import Categories from "./admin/Categories";
+
 import NewAssign from "./admin/NewAssign";
+import Export from "./admin/Export";
 export {
   Admin,
   Home,
@@ -20,6 +22,7 @@ export {
   Categories,
   AllAssignment,
   KVKK,
+  Export,
   Assignment,
   NotFound,
   RepairPage,

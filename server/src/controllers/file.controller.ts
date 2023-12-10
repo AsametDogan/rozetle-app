@@ -70,9 +70,9 @@ const exportAssignments = async (req: Request, res: Response) => {
         for (const assignment of assignments) {
             worksheet.addRow({
                 id: assignment._id.toString(),
-                senderId: assignment.senderId,
+                senderId: assignment.senderId.toString(),
                 receiverInfo: assignment.receiverInfo,
-                badgeId: assignment.badgeId,
+                badgeId: assignment.badgeId.toString(),
                 description: assignment.description,
                 assignDate: assignment.assignDate
             });

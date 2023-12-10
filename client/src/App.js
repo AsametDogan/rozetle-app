@@ -4,6 +4,7 @@ import {
   Assignment,
   Badges,
   Categories,
+  Export,
   Home,
   KVKK,
   Login,
@@ -24,6 +25,7 @@ function App() {
           <Route element={<AllAssignment />} path="/admin/assignments" />
           <Route element={<Categories />} path="/admin/categories" />
           <Route element={<NewAssign />} path="/admin/new-assign" />
+          <Route element={<Export />} path="/admin/export" />
         </Route>
         <Route element={<Login />} path={"/admin"} />
         <Route element={<Login />} path={"/admin/login"} />
