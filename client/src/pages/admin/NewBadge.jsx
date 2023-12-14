@@ -12,6 +12,7 @@ import { IconAdd, IconAddlist } from "../../assets/images/index.js";
 import { createBadge } from "../../services/badgeService.ts";
 import { ToastContainer, toast } from "react-toastify";
 import { getAllUsers } from "../../services/authService.ts";
+import Loading from "../../components/Loading.jsx";
 const NewBadge = () => {
   const [badgeData, setBadgeData] = useState({
     title: "",
@@ -24,6 +25,8 @@ const NewBadge = () => {
   const [imgPreview, setImgPreview] = useState();
   const [searchUser, setSearchUser] = useState("");
   const [isUnique, setIsUnique] = useState();
+  const [loading, setLoading] = useState(false);
+  const [loadingLabel, setLoadingLabel] = useState("");
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBadgeData({ ...badgeData, [name]: value });
@@ -45,17 +48,36 @@ const NewBadge = () => {
 
   const [categories, setCategories] = useState();
   async function fetchCategories() {
-    const response = await getAllCategory();
-    if (response) {
-      setCategories(response.data);
+    try {
+      //setLoadingLabel("Kategoriler getiriliyor...");
+
+      // setLoading(true);
+      const response = await getAllCategory();
+      if (response) {
+        setCategories(response.data);
+      }
+    } catch (error) {
+      toast.error("kategoriler getirilemedi");
+      console.log(error);
+    } finally {
+      //setLoading(false);
     }
   }
   const [users, setUsers] = useState();
 
   async function fetchUsers() {
-    const response = await getAllUsers();
-    if (response) {
-      setUsers(response);
+    try {
+      setLoadingLabel("Kullanıcılar getiriliyor...");
+      setLoading(true);
+      const response = await getAllUsers();
+      if (response) {
+        setUsers(response);
+      }
+    } catch (error) {
+      toast.error("Kullanıcılar getirilemedi");
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -79,21 +101,28 @@ const NewBadge = () => {
       formData.append("totalCount", badgeData.totalCount);
       formData.append("price", badgeData.price);
       formData.append("attainerRoles", badgeData.attainerRoles);
-      console.log(formData.get("title"));
-      const response = await createBadge(formData);
-      console.log(response);
-      if (response) {
-        toast.success("Başarılı");
-        setBadgeData({
-          title: "",
-          categoryId: "",
-          totalCount: 0,
-          price: 0,
-          attainerRoles: "",
-          badgeImg: null,
-        });
-      } else {
+      try {
+        setLoadingLabel("Rozet oluşturuluyor...");
+        setLoading(true);
+        const response = await createBadge(formData);
+        console.log(response);
+        if (response) {
+          toast.success("Başarılı");
+          setBadgeData({
+            title: "",
+            categoryId: "",
+            totalCount: 0,
+            price: 0,
+            attainerRoles: "",
+            badgeImg: null,
+          });
+        } else {
+          toast.error("Bir hata oluştu formdata");
+        }
+      } catch (error) {
         toast.error("Bir hata oluştu formdata");
+      } finally {
+        setLoading(false);
       }
     } else {
       toast.error("Tüm Alanları Doldurunuz");
@@ -412,6 +441,8 @@ const NewBadge = () => {
           <></>
         )}
       </form>
+      {loading ? <Loading label={loadingLabel} /> : <></>}
+
       <ToastContainer />
     </div>
   );

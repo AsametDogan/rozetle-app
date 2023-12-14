@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BadgeCard, UpdateBadge } from "../../components";
+import { BadgeCard, Loading, UpdateBadge } from "../../components";
 import { getAllBadges } from "../../services/badgeService.ts";
 import { ToastContainer, toast } from "react-toastify";
 import { Input } from "@material-tailwind/react";
@@ -7,12 +7,21 @@ import { Input } from "@material-tailwind/react";
 const Badges = () => {
   const [allBadges, setAllBadges] = useState();
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+
   async function fetchBadges() {
-    const response = await getAllBadges();
-    if (response) {
-      setAllBadges(response.data);
-    } else {
+    try {
+      setLoading(true);
+      const response = await getAllBadges();
+      if (response) {
+        setAllBadges(response.data);
+      } else {
+        toast.error("Rozetle Getirilemedi");
+      }
+    } catch (error) {
       toast.error("Rozetle Getirilemedi");
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -47,6 +56,7 @@ const Badges = () => {
         <></>
       )}
       <ToastContainer />
+      {loading ? <Loading /> : <></>}
     </div>
   );
 };

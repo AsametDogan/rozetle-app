@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IconDownloadXls } from "../../assets/images";
 import {
   exportAssignments,
@@ -6,13 +6,25 @@ import {
   exportCategories,
   exportUsers,
 } from "../../services/adminService.ts";
+import { toast } from "react-toastify";
+import Loading from "../../components/Loading.jsx";
 
 const Export = () => {
+  const [loading, setLoading] = useState(false);
   return (
     <div className="flex flex-wrap justify-center py-6 gap-6 h-[90vh] overflow-y-scroll ">
       <button
         onClick={async () => {
-          await exportUsers();
+          try {
+            setLoading(true);
+            await exportUsers();
+            toast.success("Dosya indirildi");
+          } catch (error) {
+            toast.error("Bir hata oluştu");
+            console.log({ exportUserError: error });
+          } finally {
+            setLoading(false);
+          }
         }}
         className="flex flex-col items-center bg-white p-6 rounded-lg shadow hover:scale-[101%] hover:shadow-lg gap-4 transition-all w-56 h-56"
       >
@@ -22,7 +34,16 @@ const Export = () => {
       </button>
       <button
         onClick={async () => {
-          await exportBadges();
+          try {
+            setLoading(true);
+            await exportBadges();
+            toast.success("Dosya indirildi");
+          } catch (error) {
+            toast.error("Bir hata oluştu");
+            console.log({ exportUserError: error });
+          } finally {
+            setLoading(false);
+          }
         }}
         className="flex flex-col items-center bg-white p-6 rounded-lg shadow hover:scale-[101%] hover:shadow-lg gap-4 transition-all w-56 h-56"
       >
@@ -32,7 +53,16 @@ const Export = () => {
       </button>
       <button
         onClick={async () => {
-          await exportCategories();
+          try {
+            setLoading(true);
+            await exportCategories();
+            toast.success("Dosya indirildi");
+          } catch (error) {
+            toast.error("Bir hata oluştu");
+            console.log({ exportUserError: error });
+          } finally {
+            setLoading(false);
+          }
         }}
         className="flex flex-col items-center bg-white p-6 rounded-lg shadow hover:scale-[101%] hover:shadow-lg gap-4 transition-all w-56 h-56"
       >
@@ -42,7 +72,16 @@ const Export = () => {
       </button>
       <button
         onClick={async () => {
-          await exportAssignments();
+          try {
+            setLoading(true);
+            await exportAssignments();
+            toast.success("Dosya indirildi");
+          } catch (error) {
+            toast.error("Bir hata oluştu");
+            console.log({ exportUserError: error });
+          } finally {
+            setLoading(false);
+          }
         }}
         className="flex flex-col items-center bg-white p-6 rounded-lg shadow hover:scale-[101%] hover:shadow-lg gap-4 transition-all w-56 h-56"
       >
@@ -50,6 +89,7 @@ const Export = () => {
         <p>Tüm atamaların listesini indir</p>
         <img src={IconDownloadXls} alt="download" className="h-16" />
       </button>
+      {loading ? <Loading /> : <></>}
     </div>
   );
 };

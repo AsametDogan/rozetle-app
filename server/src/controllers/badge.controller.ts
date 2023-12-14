@@ -49,12 +49,11 @@ const getAvailableBadges = async (req: IRequestWithUser, res: Response) => {
             model: "Category"
         });
 
-        const availableBadges = badges.filter((badge => badge.attainerRoles.includes(userRole)))
+        const availableBadges = badges.filter((badge => badge.attainerRoles.includes(userRole.toString() || userId.toString())))
         res.status(200).json({ data: availableBadges, message: "Uygun rozetler getirildi", success: true });
     } catch (error) {
         res.status(500).json({ message: 'Rozetler getirilirken bir hata oluştu', success: false });
     }
-
 }
 
 export { getAllBadges, getAvailableBadges }

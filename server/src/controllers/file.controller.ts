@@ -62,6 +62,7 @@ const exportAssignments = async (req: Request, res: Response) => {
             { header: 'Alıcı Bilgisi', key: 'receiverInfo', width: 20 },
             { header: 'Rozet Id', key: 'badgeId', width: 25 },
             { header: 'Açıklama', key: 'description', width: 25 },
+            { header: "Link", key: 'assignmentLink', width: 25 },
             { header: 'Tarih', key: 'assignDate', width: 15 },
 
 
@@ -74,6 +75,7 @@ const exportAssignments = async (req: Request, res: Response) => {
                 receiverInfo: assignment.receiverInfo,
                 badgeId: assignment.badgeId.toString(),
                 description: assignment.description,
+                assignmentLink: "https://www.rozetle.com/assign/" + assignment._id.toString(),
                 assignDate: assignment.assignDate
             });
         }

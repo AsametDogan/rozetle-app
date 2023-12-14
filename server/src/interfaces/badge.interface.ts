@@ -8,7 +8,7 @@ export default interface IBadge extends Document {
     totalCount: number;
     restCount: number;
     price: number;
-    attainerRoles: number[];
+    attainerRoles: string[];
     createdDate: Date;
     isActive: boolean;
 }

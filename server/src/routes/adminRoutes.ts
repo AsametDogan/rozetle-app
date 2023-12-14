@@ -24,6 +24,7 @@ import {
 import categoryRouter from "./categoryRoutes"
 import { adminMiddleware } from "../middleware/adminMiddleware";
 import { exportAssignments, exportBadges, exportCategories, exportUsers } from "../controllers/file.controller";
+import { getAvailableBadges } from "../controllers/badge.controller";
 const router = express.Router();
 
 const uploadBadge = multer({ storage: badgeImgStorage })
@@ -44,7 +45,8 @@ router.get("/getAllToken", getAllToken)
 
 
 router.get("/getAllBadges", getAllBadgesAdmin)
-router.post("/sendBadges", adminMiddleware, sendBadges) //bir liste alıcıya rozet + mail gönderme
+router.get("/getAvailableBadges", authMiddleware, getAvailableBadges)
+router.post("/sendBadges", authMiddleware, sendBadges) //bir liste alıcıya rozet + mail gönderme
 //{ receiversData, badgeId, description, mailSubject, mailText }
 
 

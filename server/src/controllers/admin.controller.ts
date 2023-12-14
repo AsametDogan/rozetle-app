@@ -1,15 +1,18 @@
 import excel from 'exceljs';
+import ExcelJS from 'exceljs';
 import { Request, Response, response } from "express";
 import { AssignmentModel, BadgeModel, NotifyModel, NotifyTokenModel, UserModel, VerificationModel } from "../models";
 import { IAssignment, IBadge, IRequestWithUser } from "../interfaces";
 import { mailSender } from "../helpers/mail.sender.helper";
 import { isValidEmail } from "../helpers/validation.helper";
 import { shuffleArray, trimPhone } from "../helpers/algorithms.helper";
+import mongoose from 'mongoose';
 
 
 
 
 const sendBadges = async (req: IRequestWithUser, res: Response) => {
+    const userId = req.user?._id;
     const { receiversData, badgeId, description, mailSubject, mailText } = req.body
     let assignment
     if (!receiversData || !Array.isArray(receiversData)) return res.status(400).send({ message: "emailler gelmedi", data: receiversData, success: false })
@@ -19,13 +22,20 @@ const sendBadges = async (req: IRequestWithUser, res: Response) => {
         if (!badge) {
             return res.status(404).send({ message: "Rozet bulunamadı", success: false })
         }
+        if (badge.restCount !== -999 && badge.restCount < receiversData.length) {
+            return res.status(400).send({ message: "Rozet stoğu yetersiz: " + badge.restCount, success: false })
+        }
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Assignment');
+        worksheet.addRow(['Gönderen Id', 'Rozet Id', 'Açıklama', 'Alıcı Bilgisi', 'Atama Link', 'Atama Tarihi']);
 
         for (const receiver of receiversData) { //her alıcı bilgisi için
             assignment = await AssignmentModel.findOne({
-                senderId: "userId",
+                senderId: userId,
                 receiverInfo: receiver,
                 badgeId,
             });
+
 
             if (!assignment) {
                 if (badge.restCount <= 0) {//rozet stoğu kontrolü
@@ -36,15 +46,15 @@ const sendBadges = async (req: IRequestWithUser, res: Response) => {
 
                 //atama oluştur
                 assignment = new AssignmentModel({
-                    description,
-                    senderId: "userId",
+                    description: description,
+                    senderId: userId,
                     receiverInfo: receiver,
                     badgeId,
                     assignDate: new Date(),
                 });
                 await assignment.save();
 
-                if (badge.restCount != -999) { // rozet sınırsız değilse azalt stok
+                if (badge.restCount !== -999) { // rozet sınırsız değilse azalt stok
                     badge.restCount--;
                     const updatedBadge = await BadgeModel.findByIdAndUpdate(
                         badgeId,
@@ -58,13 +68,34 @@ const sendBadges = async (req: IRequestWithUser, res: Response) => {
                 }
 
             }
-            if (isValidEmail(receiver)) {
-                await mailSender(receiver, mailSubject, mailText + "\nBu link ile rozeti görüntüleyin ve hemen siz de uygulamayı indirerek rozetlemeye başlayın\n\n" + `https://www.rozetle.com/assign/${assignment._id}`)
-            }
+            //  if (isValidEmail(receiver)) {
 
-            res.status(201).json({ message: 'Rozet gönderildi', success: true, data: null });
+            //      await mailSender(receiver, mailSubject, mailText + "\nBu link ile rozeti görüntüleyin ve hemen siz de uygulamayı indirerek rozetlemeye başlayın\n\n" + `https://www.rozetle.com/assign/${assignment._id}`)
+            //  }
 
+            worksheet.addRow([
+                userId.toString(),
+                badgeId.toString(),
+                description,
+                receiver,
+                "https://www.rozetle.com/assign/" + assignment._id.toString(),
+                assignment.assignDate
+            ]);
         }
+        worksheet.getColumn(1).width = 25;
+        worksheet.getColumn(2).width = 25;
+        worksheet.getColumn(3).width = 30;
+        worksheet.getColumn(4).width = 20;
+        worksheet.getColumn(5).width = 30;
+        worksheet.getColumn(6).width = 20;
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=assignDatas.xlsx');
+
+
+        await workbook.xlsx.write(res);
+
+        res.end();
     } catch (error) {
         console.log("sendBadge admin: " + error)
         return res.status(500).json({ message: 'Rozet gönderilirken bir hata meydana geldi', success: false });
@@ -298,8 +329,27 @@ const getAllBadgesAdmin = async (req: Request, res: Response) => {
             const datas = await AssignmentModel.find({ badgeId: badge._id })
             data.push({ ...badge, count: datas.length })
         }
-
         res.status(200).json({ data: data, success: true, message: "Rozetler getirildi" });
+    } catch (error) {
+        res.status(500).json({ message: 'Rozetler getirilirken bir hata oluştu', success: false });
+    }
+}
+const getAvailableBadgesAdmin = async (req: IRequestWithUser, res: Response) => {
+    const userId = req.user?._id
+    const userRole = req.user?.role
+    let data = [];
+
+    try {
+        const badges = await BadgeModel.find().populate({
+            path: "categoryId",
+            model: "Category"
+        });
+        for (const badge of badges) {
+            const datas = await AssignmentModel.find({ badgeId: badge._id })
+            data.push({ ...badge, count: datas.length })
+        }
+        const filteredDatas = data.filter((data) => data?._doc?.attainerRoles.includes(userRole.toString() || userId.toString()))
+        res.status(200).json({ data: filteredDatas, success: true, message: "Rozetler getirildi" });
     } catch (error) {
         res.status(500).json({ message: 'Rozetler getirilirken bir hata oluştu', success: false });
     }
@@ -368,7 +418,7 @@ export {
     getAllToken,
     deleteAssign,
     deleteBadge, changeIsActive,
-    getAllBadgesAdmin,
+    getAllBadgesAdmin, getAvailableBadgesAdmin,
     getAllVerification, uploadImgLink,
     deleteUser,
     getAllAssign,

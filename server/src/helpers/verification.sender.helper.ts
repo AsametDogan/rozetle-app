@@ -86,7 +86,7 @@ export const sendVerificationCode = async (email: string, verificationCode: stri
                   <p>Doğrulama kodunuz:</p>
                   <p class="verification-code">${verificationCode}</p>
                   <p>Uygulamada açılan ekrana doğrulama kodunu girerek devam edebilirsiniz.</p>
-                  <p>Durma hemen <strong>"Rozetle"</strong> ile Rozetle Bence</p>
+                  <p><strong>Seviyorsan Git Rozetle Bence</strong></p>
                   <div class="image-container">
                     <img src="https://rozetle.com:5001/api/image/img/1700305442585-badge-Authentication.gif" alt="Resim">
                   </div>

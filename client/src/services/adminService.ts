@@ -35,6 +35,27 @@ export const changeIsActive = async ({ badgeId }) => {
         return false
     }
 }
+export const sendBadges = async ({ badgeId, receiversData, description }) => {
+    const token = localStorage.getItem("auth-token")
+
+    const data = { badgeId, receiversData, description }
+
+    try {
+        const response = await axios.post(`https://www.rozetle.com:5005/api/admin/sendBadges`, data, {
+            responseType: 'blob',
+            headers: {
+                'auth-token': token,
+            },
+        });
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+        saveAs(blob, 'assignDatas.xlsx');
+        console.log(response)
+        return response.status
+    } catch (error) {
+        console.error('Badge failed', error);
+        return false
+    }
+}
 
 export const exportUsers = async () => {
     const token = localStorage.getItem("auth-token")

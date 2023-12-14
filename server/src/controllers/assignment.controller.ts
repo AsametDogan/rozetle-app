@@ -36,7 +36,7 @@ const newAssign = async (req: IRequestWithUser, res: Response) => {
         if (userRole == null) {
             return res.status(401).json({ message: 'Yetkilendirme hatası: user role', success: false });
         }
-        if (!badge.attainerRoles.includes(userRole)) {
+        if (!badge.attainerRoles.includes(userRole.toString())) {
             return res.status(401).json({ message: 'Bu rozeti almaya yetkiniz yoktur', success: false });
         }
         if (badge.restCount <= 0) {

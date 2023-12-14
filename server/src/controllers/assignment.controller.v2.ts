@@ -41,7 +41,7 @@ const newAssign = async (req: IRequestWithUser, res: Response) => {
         if (userRole == null) {
             return res.status(401).json({ message: 'Yetkilendirme hatası: user role', success: false });
         }
-        if (!badge.attainerRoles.includes(userRole)) {
+        if (!badge.attainerRoles.includes(userRole.toString())) {
             return res.status(401).json({ message: 'Bu rozeti almaya yetkiniz yoktur', success: false });
         }
         if (badge.restCount <= 0) {
@@ -87,12 +87,12 @@ const newAssign = async (req: IRequestWithUser, res: Response) => {
         console.log(receiverUser)
         if (receiverUser) {
             console.log("first")
-            setNotify(receiverUser?._id, "Hesabınıza bir rozet geldi", `${req.user?.name} ${req.user?.surname} kullanıcısı sana ${badge.title} rozetini gönderdi\nHemen sen de Rozetle`)
+            setNotify(receiverUser?._id, "Rozetlendin !", `${req.user?.name} ${req.user?.surname} kullanıcısı sana ${badge.title} rozetini gönderdi\nHemen sen de Rozetle`)
             const tokenData = await NotifyTokenModel.findOne({ userId: receiverUser?._id })
             if (tokenData) {
                 const message = {
                     notification: {
-                        title: 'Bir Rozet Aldınız',
+                        title: 'Rozetlendiniz',
                         body: `${req.user?.name} ${req.user?.surname} kullanıcısı sana ${badge.title} rozetini gönderdi\nHemen sen de Rozetle`
                     },
                     token: tokenData.firebaseToken
@@ -116,6 +116,8 @@ const newAssign = async (req: IRequestWithUser, res: Response) => {
         res.status(500).json({ message: 'Rozet gönderilirken bir hata oluştu', data: "", baseUrl: "https://www.rozetle.com/assign/", success: false });
     }
 }
+
+
 
 
 

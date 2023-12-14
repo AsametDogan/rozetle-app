@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NewCategory } from "../../components";
+import { Loading, NewCategory } from "../../components";
 import { IconAccept, IconAdd, IconEdit } from "../../assets/images";
 import {
   getAllCategory,
@@ -11,16 +11,24 @@ import { ToastContainer, toast } from "react-toastify";
 const Categories = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [categories, setCategories] = useState();
+  const [loading, setLoading] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [edit, setEdit] = useState();
 
   async function fetchCategories() {
-    const response = await getAllCategory();
-    if (response) {
-      setCategories(response.data);
-      //toast.success("Kategoriler getirildi");
-    } else {
+    try {
+      setLoading(true);
+      const response = await getAllCategory();
+      if (response) {
+        setCategories(response.data);
+        //toast.success("Kategoriler getirildi");
+      } else {
+        toast.error("Kategoriler getirilemedi");
+      }
+    } catch (error) {
       toast.error("Kategoriler getirilemedi");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -106,6 +114,7 @@ const Categories = () => {
         </div>
       </div>
       <ToastContainer autoClose={2500} />
+      {loading ? <Loading /> : <></>}
     </div>
   );
 };

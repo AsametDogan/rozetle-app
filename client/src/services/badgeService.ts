@@ -18,6 +18,23 @@ export const getAllBadges = async () => {
         return false
     }
 }
+export const getAvailableBadges = async () => {
+    try {
+        const token = localStorage.getItem("auth-token")
+
+        const response = await axios.get(`https://www.rozetle.com:5005/api/admin/getAllBadges`, {
+            headers: {
+                'auth-token': token
+            },
+        });
+
+        console.log(response)
+        return response.data
+    } catch (error) {
+        console.error('Badge failed', error);
+        return false
+    }
+}
 
 export const createBadge = async (formData) => {
 

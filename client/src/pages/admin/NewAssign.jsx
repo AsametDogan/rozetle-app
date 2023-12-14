@@ -1,27 +1,42 @@
-import { Input, Radio, Textarea } from "@material-tailwind/react";
+import { Button, Input, Radio, Textarea } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { getAllBadges } from "../../services/badgeService.ts";
+import {
+  getAllBadges,
+  getAvailableBadges,
+} from "../../services/badgeService.ts";
+import { sendBadges } from "../../services/adminService.ts";
+import Loading from "../../components/Loading.jsx";
 const NewAssign = () => {
   const [inputText, setInputText] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedBadge, setSelectedBadge] = useState();
   const [list, setList] = useState([]);
   const [allBadges, setAllBadges] = useState();
-  const [selectedBadge, setSelectedBadge] = useState();
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loadingLabel, setLoadingLabel] = useState("");
 
   const handleInputChange = (e) => {
     const text = e.target.value.toLowerCase();
     setInputText(text);
-
     const linesArray = text.split("\n").filter((line) => line.trim() !== "");
     setList(linesArray);
   };
   async function fetchBadges() {
-    const response = await getAllBadges();
-    if (response) {
-      setAllBadges(response.data);
-    } else {
-      toast.error("Rozetle Getirilemedi");
+    try {
+      setLoadingLabel("Rozetler Getiriliyor...");
+      setLoading(true);
+      const response = await getAvailableBadges();
+      if (response) {
+        setAllBadges(response.data);
+      } else {
+        toast.error("Rozetler Getirilemedi");
+      }
+    } catch (error) {
+      toast.error("Rozetler Getirilemedi");
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -31,7 +46,6 @@ const NewAssign = () => {
   const handleSelectRadio = (e) => {
     setSelectedBadge(e.target.value);
   };
-  console.log(selectedBadge);
   const filteredData = allBadges?.filter((item) => {
     if (!allBadges) {
       return [];
@@ -43,21 +57,67 @@ const NewAssign = () => {
         .includes(searchTerm.toLowerCase())
     );
   });
+  console.log(selectedBadge);
+  console.log(list);
+
   return (
     <div className="flex flex-col items-center py-6">
-      <div className="bg-white p-8 rounded-lg flex flex-col gap-5 items-center">
-        <div className="!w-[500px]">
+      <div className="bg-white p-8 rounded-lg flex divide-x-2  gap-5 items-center">
+        <div className="flex flex-col gap-10 items-center">
+          <div className="!w-[500px]">
+            <Textarea
+              size="lg"
+              className="w-[500px]"
+              value={inputText}
+              onChange={handleInputChange}
+              variant="outlined"
+              label="Mail Listesi"
+            />
+            <label className="text-gray-700 text-xs">
+              *Her satır yeni bir mail
+            </label>
+            <br />
+            <p className="text-sm">
+              {"Gönderilecek rozet sayısı:" + list.length}
+            </p>
+          </div>
           <Textarea
-            size="lg"
+            size="md"
             className="w-[500px]"
-            value={inputText}
-            onChange={handleInputChange}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             variant="outlined"
-            label="Mail Listesi"
+            label="Açıklama"
           />
-          <label className="text-gray-700 text-xs">
-            *Her satır yeni bir mail
-          </label>
+          <Button
+            onClick={async () => {
+              try {
+                setLoadingLabel("Rozetleniyor...");
+                setLoading(true);
+                await sendBadges({
+                  badgeId: selectedBadge,
+                  description: description,
+                  receiversData: list,
+                }).then((res) => {
+                  if (res === 200) {
+                    toast.success("Rozet Gönderme işlemi başarılı");
+                    setDescription("");
+                    setInputText("");
+                    setList([]);
+                  } else {
+                    toast.error("Bir hata oluştu");
+                  }
+                });
+              } catch (error) {
+                toast.error("Bir hata oluştu");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="px-3 py-2 bg-teal-800 text-white hover:bg-teal-500 hover:shadow-lg transition-all rounded-lg"
+          >
+            GÖNDER
+          </Button>
         </div>
         <div className="flex flex-col gap-2 items-center">
           {" "}
@@ -105,6 +165,7 @@ const NewAssign = () => {
           </div>
         </div>
       </div>
+      {loading ? <Loading label={loadingLabel} /> : <></>}
       <ToastContainer />
     </div>
   );

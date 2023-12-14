@@ -3,19 +3,26 @@ import { getInfo } from "../../services/assignService.ts";
 import { ToastContainer, toast } from "react-toastify";
 import { Radio, Switch } from "@material-tailwind/react";
 import { changeRole, exportUsers } from "../../services/adminService.ts";
+import Loading from "../../components/Loading.jsx";
 
 const AllAssignment = () => {
   const [assignments, setAssignments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState("sent");
-
+  const [loading, setLoading] = useState(false);
   async function fetchAssignments() {
-    const response = await getInfo();
-    if (response) {
-      //toast.success("Rozetlemeler getirildi");
-      setAssignments(response);
-    } else {
-      toast.error("Rozetlemeler getirilemedi");
+    try {
+      setLoading(true);
+      const response = await getInfo();
+      if (response) {
+        //toast.success("Rozetlemeler getirildi");
+        setAssignments(response);
+      } else {
+        toast.error("Rozetlemeler getirilemedi");
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -131,17 +138,7 @@ const AllAssignment = () => {
             label="Alma"
           />
         </div>
-        <div>
-          <button
-            className=""
-            onClick={async () => {
-              const res = await exportUsers();
-              console.log(res);
-            }}
-          >
-            asdads
-          </button>
-        </div>
+        {loading ? <Loading /> : <></>}
       </div>
     </div>
   );

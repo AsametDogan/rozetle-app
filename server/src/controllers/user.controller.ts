@@ -16,11 +16,18 @@ const uploadProfile = multer({ storage: profileImgStorage })
 const register = async (req: Request, res: Response) => {
     try {
         let { nickName, name, surname, email, password, phone } = req.body;
-        name = name.trim();
-        surname = surname.trim();
+        if (name) {
+            name = name?.trim();
+        }
+        if (surname) {
+
+            surname = surname.trim();
+        }
         email = email.toLowerCase().trim(); // register email string
-        phone = trimPhone(phone)
-        console.log("Register 1")
+        if (phone) {
+
+            phone = trimPhone(phone)
+        }
         if (!isValidEmail(email)) {
             console.log("Register 2")
 
