@@ -83,15 +83,10 @@ const Home = () => {
                 </div>
               </div>
             </p>
-            <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] sm:mt-8 rounded-[2.5rem] h-[600px] w-[300px] md:h-[500px] sm:h-[400px]  md:w-[250px] sm:w-[200px]  ">
-              <div className="h-[32px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[72px] rounded-l-lg"></div>
-              <div className="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
-              <div className="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
-              <div className="h-[64px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
-              <div className="rounded-[2rem] overflow-hidden  bg-white dark:bg-gray-800">
-                <img src={ImgMockup} className="dark:hidden " alt="" />
-              </div>
+            <div className=" flex justify-center w-full">
+              <img className="max-w-[300px] lg:max-w-[250px] sm:max-w-[275px]" src={ImgMockup} alt="" />
             </div>
+
             <img
               className="max-w-[80%] md:max-w-[65%] sm:max-w-[90%] justify-self-center"
               src={GifGetBadge}
@@ -289,15 +284,10 @@ const Home = () => {
                   </button>
                 </div>
               </div>
-              <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] sm:mt-8 rounded-[2.5rem] h-[600px] w-[300px] md:h-[500px] sm:h-[400px]  md:w-[250px] sm:w-[200px]  ">
-                <div className="h-[32px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[72px] rounded-l-lg"></div>
-                <div className="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
-                <div className="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
-                <div className="h-[64px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
-                <div className="rounded-[2rem] overflow-hidden  bg-white dark:bg-gray-800">
-                  <img src={ImgMockup} className="dark:hidden " alt="" />
-                </div>
+              <div className=" flex justify-center w-full">
+                <img className="max-w-[300px] lg:max-w-[250px] sm:max-w-[275px]" src={ImgMockup} alt="" />
               </div>
+
             </div>
           </div>
         </div>

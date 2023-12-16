@@ -116,6 +116,7 @@ const NewBadge = () => {
             attainerRoles: "",
             badgeImg: null,
           });
+          setImgPreview(null)
         } else {
           toast.error("Bir hata oluştu formdata");
         }
